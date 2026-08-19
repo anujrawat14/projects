@@ -239,16 +239,8 @@ https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/
 ```
 
 The selected currency is added to the API URL to retrieve its exchange rates.
-
-## 📸 Project Preview
-
-Add a screenshot of your application here after uploading one:
-
-```text
 ## 📸 Project Preview
 
 ![Currency Converter](./src/screenshot.png)
-```
-
 
 Built as a React learning project while practicing React Hooks, Custom Hooks, API integration, and Tailwind CSS.
