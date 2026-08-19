@@ -245,7 +245,9 @@ The selected currency is added to the API URL to retrieve its exchange rates.
 Add a screenshot of your application here after uploading one:
 
 ```text
-![Currency Converter](./screenshot.png)
+## 📸 Project Preview
+
+![Currency Converter](./src/screenshot.png)
 ```
 
 
