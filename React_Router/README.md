@@ -63,9 +63,21 @@ src/
 ├── App.jsx
 ├── main.jsx
 └── index.css
-
-
+```
 ## 📸 Screenshots
 
+### 🏠 Home Page
 
-![React_Router](./screenshots/home.png)
+![Home Page](./screenshots/home.png)
+
+### ℹ️ About Page
+
+![About Page](./screenshots/about.png)
+
+### 📞 Contact Page
+
+![Contact Page](./screenshots/contact.png)
+
+### 🐙 GitHub Page
+
+![GitHub Page](./screenshots/github.png)
