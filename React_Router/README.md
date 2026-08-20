@@ -63,3 +63,15 @@ src/
 ├── App.jsx
 ├── main.jsx
 └── index.css
+
+
+## 📸 Screenshots
+
+### Home Page
+![Home Page](./screenshots/home.png)
+
+### About Page
+![About Page](./screenshots/about.png)
+
+### GitHub Page
+![GitHub Page](./screenshots/github.png)
