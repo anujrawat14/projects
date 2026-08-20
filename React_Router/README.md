@@ -1,16 +1,65 @@
-# React + Vite
+# 🚀 React Router Project
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A React project built to learn and practice **React Router DOM**, routing, dynamic routes, route loaders, API integration, and reusable components.
 
-Currently, two official plugins are available:
+## 🛠️ Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React
+- React Router DOM
+- JavaScript
+- Axios
+- Tailwind CSS
+- Vite
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- 🏠 Home, About, Contact and GitHub pages
+- 🔗 Navigation using `Link` and `NavLink`
+- 🧭 Nested routing with `Outlet`
+- 🔀 Dynamic routes with `useParams`
+- 📦 Route loaders with `useLoaderData`
+- 🐙 GitHub API integration using Axios
+- 🧩 Reusable Header and Footer components
+- 📁 Centralized component exports using `index.js`
+- 🎨 Responsive UI using Tailwind CSS
 
-## Expanding the Oxlint configuration
+## 🧭 Routes
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+| Route | Page |
+|---|---|
+| `/` | Home |
+| `/about` | About |
+| `/contact` | Contact |
+| `/github` | GitHub |
+| `/:id` | Dynamic Route |
+| `/user/:userId` | User Route |
+
+## 🐙 GitHub API
+
+The GitHub page fetches user information from the GitHub API and displays:
+
+- Profile image
+- Public repository count
+- Followers
+
+The API data is loaded using a React Router **loader** and accessed using `useLoaderData()`.
+
+## 📁 Project Structure
+
+```text
+src/
+├── components/
+│   ├── about/
+│   ├── contact/
+│   ├── footer/
+│   ├── github/
+│   ├── header/
+│   ├── home/
+│   ├── random/
+│   ├── user/
+│   └── index.js
+│
+├── Layout.jsx
+├── App.jsx
+├── main.jsx
+└── index.css
