@@ -67,4 +67,5 @@ src/
 
 ## 📸 Screenshots
 
-![React Router Project](../screenshot.png)
+
+![React_Router](./screenshots/home.png)
