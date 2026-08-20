@@ -68,6 +68,9 @@ src/
 ## 📸 Screenshots
 
 ### Home Page
+## 📸 Screenshot
+
+![React Router Project](./screenshots/home.png)
 ![Home Page](./screenshots/home.png)
 
 ### About Page
