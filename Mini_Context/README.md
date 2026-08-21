@@ -96,7 +96,7 @@ Then open the local URL provided by Vite.
 
 
 
-![Home Page](./screenshots/home.png)
+![Home Page](./screenshot.png)
 
 ## 🎯 Purpose
 
