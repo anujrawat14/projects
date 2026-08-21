@@ -94,11 +94,9 @@ Then open the local URL provided by Vite.
 
 ## 📸 Project Preview
 
-Add a screenshot of your application here:
 
-```md
-![React Context API Login](./screenshot.png)
-```
+
+![Home Page](./screenshots/home.png)
 
 ## 🎯 Purpose
 
