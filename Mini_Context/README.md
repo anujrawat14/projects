@@ -1,16 +1,105 @@
-# React + Vite
+# React Context API – Login & Profile
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A simple React project built to understand and practice **React Context API**, `useContext`, `useState`, and component communication.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- User login form
+- Global user state using **Context API**
+- Display logged-in username
+- Show/Hide profile details
+- Controlled inputs using `useState`
+- Tailwind CSS styling
+- Component-based structure
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React
+- JavaScript
+- Tailwind CSS
+- Vite
+- React Context API
 
-## Expanding the Oxlint configuration
+## 🧠 Concepts Learned
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+### 1. createContext()
+
+Used to create a global context:
+
+```js
+const userContext = React.createContext();
+```
+
+### 2. Context Provider
+
+The provider stores and shares the user data:
+
+```jsx
+<userContext.Provider value={{ user, setUser }}>
+    {children}
+</userContext.Provider>
+```
+
+### 3. useContext()
+
+Components can access shared user data without passing props:
+
+```js
+const { user, setUser } = useContext(userContext);
+```
+
+### 4. Local State
+
+`useState` is used for component-specific data such as form inputs and profile visibility:
+
+```js
+const [showDetails, setShowDetails] = useState(false);
+```
+
+## 🔄 Application Flow
+
+```text
+Login
+  ↓
+User enters username & password
+  ↓
+setUser()
+  ↓
+Context stores user information
+  ↓
+Profile receives user using useContext()
+  ↓
+User profile is displayed
+  ↓
+View Profile
+  ↓
+Show / Hide user details
+```
+
+## ▶️ Run Locally
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Then open the local URL provided by Vite.
+
+## 📸 Project Preview
+
+Add a screenshot of your application here:
+
+```md
+![React Context API Login](./screenshot.png)
+```
+
+## 🎯 Purpose
+
+This project was created as part of my React learning journey to understand how **Context API can be used to manage and share state between components without prop drilling**.
