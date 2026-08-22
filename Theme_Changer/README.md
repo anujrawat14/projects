@@ -193,7 +193,7 @@ npm run dev
 
 Add your screenshot to the project root and name it `screenshot.png`.
 
-![Theme Switcher](./screenshot.png)
+![Theme Switcher](./ssdark.png)
 
 ---
 
