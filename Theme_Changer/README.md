@@ -189,11 +189,15 @@ npm run dev
 
 ---
 
-## 📸 Project Preview
+## 📸 Project Preview light theme
 
-Add your screenshot to the project root and name it `screenshot.png`.
+
+![Theme Switcher](./sslight.png)
+
+## 📸 Project Preview dark theme
 
 ![Theme Switcher](./ssdark.png)
+
 
 ---
 
