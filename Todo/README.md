@@ -186,7 +186,6 @@ This allows the Todo data to remain available after refreshing the browser.
 
 ## 📸 Project Preview
 
-Add your screenshot here:
 
 
 ![Todo App](./screenshot.png)
