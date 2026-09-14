@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch } from "react-redux"
 import authService from "./appwrite/Auth";
 import { login, logout } from "./store/AuthSlice"
-import {Header,Footer} from "./components"
+import { Header, Footer } from "./components"
+import { Outlet } from "react-router-dom";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -32,13 +33,14 @@ function App() {
   }, [])
 
   //conditional rendering if loading true then loading UI
-  if (loading) {
+  if (!loading) {
     return (
       <div className='min-h-screen flex flex-wrap bg-gray-400'>
         <div className='w-full block'>
           <Header />
           <main>
-            {/* <Outlet/> handle outlet by react router dom */}
+            <Outlet />
+            {/* handle outlet by react router dom */}
           </main>
           <Footer />
         </div>
@@ -48,6 +50,16 @@ function App() {
   else {
     return null;
   }
+  // return !loading ? (
+  //   <div className='min-h-screen flex flex-wrap content-between bg-gray-400'>
+  //     <div className='w-full block '>
+  //       <Header/>
+  //       <Outlet/>
+  //       <Footer/>
+  //     </div>
+
+  //   </div>
+  // ) : null
 }
 
 export default App

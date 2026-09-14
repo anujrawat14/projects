@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { addTodo } from "../features/Todo/TodoSlice"
 
+
 const Addtodo = () => {
 
     const [input, setInput] = useState('')

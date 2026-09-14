@@ -1168,7 +1168,403 @@ createEmailPasswordSession()
 
 This makes the service reusable and keeps the UI code cleaner.
 
+
 ---
+# Redux Store
+
+The **Store** is the central place where Redux keeps the application's global state.
+
+In this project, the Store combines the different slices of the application.
+
+## Store Structure
+
+```text
+Store
+  │
+  ├── auth
+  │     ├── status
+  │     └── userData
+  │
+  └── post
+        └── posts
+```
+
+## Creating the Store
+
+The Store is created using `configureStore()` from Redux Toolkit.
+
+```js
+import { configureStore } from "@reduxjs/toolkit";
+
+import AuthSlice from "./AuthSlice";
+import PostSlice from "./PostSlice";
+
+const Store = configureStore({
+
+    reducer: {
+        auth: AuthSlice,
+        post: PostSlice
+    }
+
+});
+
+export default Store;
+```
+
+## What is happening here?
+
+`AuthSlice` manages the authentication state:
+
+```text
+AuthSlice
+    ↓
+auth
+```
+
+`PostSlice` manages the posts state:
+
+```text
+PostSlice
+    ↓
+post
+```
+
+Both are combined inside the Store:
+
+```text
+AuthSlice ──┐
+            ├──> Store
+PostSlice ──┘
+```
+
+## State inside the Store
+
+The current Redux state will look conceptually like:
+
+```js
+{
+    auth: {
+        status: false,
+        userData: null
+    },
+
+    post: {
+        posts: []
+    }
+}
+```
+
+Here:
+
+* `auth` → state managed by `AuthSlice`
+* `post` → state managed by `PostSlice`
+
+## Store vs Slice
+
+A **Slice** manages one specific part of the application state.
+
+A **Store** combines all those slices into one central Redux state.
+
+```text
+Slice
+  ↓
+Manages a particular state
+
+Store
+  ↓
+Combines all slices
+  ↓
+Contains the complete Redux state
+```
+
+## Accessing Store Data
+
+React components can read data from the Store using:
+
+```js
+useSelector()
+```
+
+For example:
+
+```js
+const auth = useSelector((state) => state.auth);
+```
+
+Components can send actions to modify the Store using:
+
+```js
+useDispatch()
+```
+
+For example:
+
+```js
+dispatch(login({ userData }));
+```
+
+## Complete Flow
+
+```text
+React Component
+      │
+      ├── useSelector()
+      │       ↓
+      │     Store
+      │
+      └── useDispatch()
+              ↓
+           Action
+              ↓
+           Slice
+              ↓
+        Updated State
+              ↓
+            Store
+```
+
+### Important Concept
+
+> **Slice manages a particular part of the state, while Store combines all the slices into one central Redux state.**
+
+# Redux Store in App.jsx
+
+Redux is used to manage shared application state.
+
+In this project, the store contains two main parts:
+
+```text
+Redux Store
+    |
+    +── auth
+    |     └── AuthSlice
+    |
+    └── post
+          └── PostSlice
+```
+
+The store is created using `configureStore()`:
+
+```js
+const Store = configureStore({
+    reducer: {
+        auth: AuthSlice,
+        post: PostSlice
+    }
+});
+```
+
+The `auth` state is managed by `AuthSlice`, while the `post` state is managed by `PostSlice`.
+
+---
+
+## Connecting Redux Store to React
+
+The Redux store needs to be connected to the React application using `Provider`.
+
+This is usually done in `main.jsx`:
+
+```js
+import { Provider } from "react-redux";
+import Store from "./store/Store";
+
+<Provider store={Store}>
+    <App />
+</Provider>
+```
+
+`Provider` makes the Redux store available to all React components inside it.
+
+Conceptually:
+
+```text
+main.jsx
+    |
+    v
+Provider
+    |
+    |── Redux Store
+    |
+    v
+App.jsx
+    |
+    +── Header
+    +── Outlet
+    +── Footer
+```
+
+Because `App` is inside the `Provider`, it can use Redux hooks such as:
+
+```js
+useDispatch()
+useSelector()
+```
+
+---
+
+## Using Redux in App.jsx
+
+`App.jsx` uses `useDispatch()` to send authentication actions to Redux.
+
+```js
+const dispatch = useDispatch();
+```
+
+When the application starts, `App.jsx` checks whether a user is already logged in:
+
+```js
+authService.getCurrentUser()
+    .then((userData) => {
+
+        if (userData) {
+            dispatch(login({ userData }));
+        }
+        else {
+            dispatch(logout());
+        }
+
+    })
+    .finally(() => setLoading(false));
+```
+
+The flow is:
+
+```text
+App.jsx
+   |
+   v
+getCurrentUser()
+   |
+   v
+Does user exist?
+   |
+   +──── YES ────> dispatch(login())
+   |
+   +──── NO ─────> dispatch(logout())
+                         |
+                         v
+                    Redux Store
+```
+
+The important concept is that `App.jsx` does not directly change the Redux state.
+
+It sends an **action** using `dispatch()`.
+
+```text
+Component
+    |
+    | dispatch(login(...))
+    v
+AuthSlice reducer
+    |
+    v
+Redux Store
+    |
+    v
+Updated auth state
+```
+
+---
+
+## Why App.jsx Checks the User
+
+When the application starts, Redux initially contains:
+
+```js
+{
+    auth: {
+        status: false,
+        userData: null
+    }
+}
+```
+
+But this does not automatically tell us whether an existing Appwrite session exists.
+
+Therefore, `App.jsx` asks Appwrite:
+
+```js
+authService.getCurrentUser()
+```
+
+If Appwrite returns a user:
+
+```text
+App starts
+   ↓
+Check Appwrite session
+   ↓
+User found
+   ↓
+dispatch(login())
+   ↓
+Redux auth.status = true
+```
+
+If Appwrite does not return a user:
+
+```text
+App starts
+   ↓
+Check Appwrite session
+   ↓
+No user found
+   ↓
+dispatch(logout())
+   ↓
+Redux auth.status = false
+```
+
+This connects the **real authentication state from Appwrite** with the **application state stored in Redux**.
+
+---
+
+## Role of Loading State
+
+`loading` is local React state:
+
+```js
+const [loading, setLoading] = useState(true);
+```
+
+It is not necessary to put this in Redux because it is only being used by `App.jsx`.
+
+The flow is:
+
+```text
+loading = true
+      ↓
+Check current Appwrite user
+      ↓
+Dispatch login/logout
+      ↓
+setLoading(false)
+      ↓
+Render application
+```
+
+This prevents the application from rendering its normal content before the initial authentication check has completed.
+
+---
+
+## Important Difference
+
+```text
+Appwrite
+   ↓
+Actual authentication/session
+```
+
+while:
+
+```text
+Redux
+   ↓
+Application's shared authentication state
+```
+
+So Appwrite is the source for checking the user's actual session, while Redux keeps the user information available to React components throughout the application.
+
 
 # Current Project Structure
 
@@ -1189,6 +1585,8 @@ src/
 
 │   ├── Auth.js
 
+|   ├── Bucket.js 
+
 │   └── Config.js
 
 │
@@ -1202,8 +1600,11 @@ src/
 │
 
 ├── store/
+│   ├── Store.js
 
-│
+│   └── AuthSlice.js
+
+│   └── PostSlice.js
 
 ├── hooks/
 
@@ -1221,6 +1622,136 @@ The exact structure can evolve as the project grows.
 The important principle is **separation of responsibility**.
 
 ---
+# Reusable Components
+
+Since the application is component-based, common UI elements are created as reusable components. This avoids repeating the same code and styling throughout the application.
+
+## Container Component
+
+The `Container` component provides a common wrapper for controlling width, spacing, and alignment of page content.
+
+```jsx
+const Container = ({ children }) => {
+    return (
+        <div className="w-full mx-auto px-4">
+            {children}
+        </div>
+    )
+}
+```
+
+### Why use it?
+
+Instead of repeating the same layout classes throughout the application, we can reuse:
+
+```jsx
+<Container>
+    <h1>Blog Posts</h1>
+</Container>
+```
+
+`children` represents whatever content is placed inside the `Container`.
+
+---
+
+## Button Component
+
+The `Button` component is a reusable button with common Tailwind CSS styling.
+
+```jsx
+const Button = ({
+    text,
+    type = "button",
+    bgColor = "bg-blue-400",
+    textColor = "text-white",
+    className = "",
+    ...props
+}) => {
+    return (
+        <button
+            type={type}
+            {...props}
+            className={`px-4 py-2 rounded-lg ${className} ${bgColor} ${textColor}`}
+        >
+            {text}
+        </button>
+    )
+}
+```
+
+### Why use it?
+
+```jsx
+<Button text="Login" />
+```
+
+It can also be customized using props:
+
+```jsx
+<Button
+    text="Delete"
+    bgColor="bg-red-500"
+/>
+```
+
+`...props` allows other button properties such as `onClick` and `disabled` to be passed to the actual button.
+
+---
+
+## Input Component
+
+The `Input` component is a reusable input field with common styling and an optional label.
+
+```jsx
+const Input = ({
+    ref,
+    label,
+    type = "text",
+    className = "",
+    ...props
+}) => {
+    const id = useId();
+
+    return (
+        <div className="w-full">
+            {label && (
+                <label htmlFor={id}>
+                    {label}
+                </label>
+            )}
+
+            <input
+                ref={ref}
+                id={id}
+                type={type}
+                className={`px-3 py-2 rounded-lg bg-white text-black outline-none focus:bg-gray-50 duration-200 border border-gray-200 w-full ${className}`}
+                {...props}
+            />
+        </div>
+    )
+}
+```
+
+### Why use it?
+
+Forms such as Login, Signup, and Create Article require multiple input fields. Instead of repeating the same styling and structure, we can reuse:
+
+```jsx
+<Input
+    label="Email"
+    type="email"
+    placeholder="Enter your email"
+/>
+```
+
+Important props:
+
+* `label` → displays the input label
+* `type` → defines the input type
+* `className` → allows additional styling
+* `ref` → allows access to the input element
+* `...props` → passes other HTML input properties
+
 
 # Complete Backend Flow
 
