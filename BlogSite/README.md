@@ -1752,6 +1752,129 @@ Important props:
 * `ref` → allows access to the input element
 * `...props` → passes other HTML input properties
 
+## Select Component
+
+The `Select` component is a reusable dropdown with common styling, an optional label, and dynamic options.
+
+```jsx
+import React, { useId } from 'react'
+
+const Select = ({
+    ref,
+    options,
+    label,
+    className = "",
+    ...props
+}) => {
+
+    const id = useId();
+
+    return (
+        <div className="w-full">
+
+            {label && (
+                <label htmlFor={id}>
+                    {label}
+                </label>
+            )}
+
+            <select
+                ref={ref}
+                id={id}
+                {...props}
+                className={`px-3 py-2 rounded-lg bg-white text-black outline-none focus:bg-gray-50 duration-200 border border-gray-200 w-full ${className}`}
+            >
+                {options?.map((option) => (
+                    <option value={option} key={option}>
+                        {option}
+                    </option>
+                ))}
+            </select>
+
+        </div>
+    )
+}
+
+export default Select
+```
+
+### Why use it?
+
+Instead of creating the same `<select>` styling repeatedly, we can reuse:
+
+```jsx
+<Select
+    label="Category"
+    options={["Technology", "Travel", "Education"]}
+/>
+```
+
+Important props:
+
+* `options` → provides the dropdown options
+* `label` → displays the select label
+* `className` → allows additional styling
+* `ref` → allows access to the select element
+* `...props` → passes other HTML select properties
+
+## Login and Signup Components
+
+### Login Component
+
+The `Login` component handles user login using React Hook Form, Appwrite Auth, and Redux.
+
+### Flow
+
+```text
+User submits Login form
+        ↓
+React Hook Form validates data
+        ↓
+authService.login(data)
+        ↓
+authService.getCurrentUser()
+        ↓
+dispatch(authLogin(userData))
+        ↓
+navigate("/")
+```
+
+* `useForm()` handles form data and validation.
+* `authService.login()` creates the login session using Appwrite.
+* `getCurrentUser()` gets the logged-in user's data.
+* `authLogin()` stores the user in Redux.
+* `navigate("/")` redirects the user to the home page.
+* Appwrite errors are stored in `error` state and displayed to the user.
+
+---
+
+### Signup Component
+
+The `Signup` component handles new user registration using React Hook Form, Appwrite Auth, and Redux.
+
+### Flow
+
+```text
+User submits Signup form
+        ↓
+React Hook Form validates data
+        ↓
+authService.createAccount(data)
+        ↓
+authService.getCurrentUser()
+        ↓
+dispatch(authLogin(currentUser))
+        ↓
+navigate("/")
+```
+
+* `useForm()` handles form data and validation.
+* `authService.createAccount()` creates the user account and logs the user in.
+* `getCurrentUser()` gets the newly created user's data.
+* `authLogin()` stores the user in Redux.
+* `navigate("/")` redirects the user to the home page.
+* Appwrite errors are handled using the `error` state.
+
 
 # Complete Backend Flow
 
