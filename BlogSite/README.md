@@ -1876,6 +1876,583 @@ navigate("/")
 * Appwrite errors are handled using the `error` state.
 
 
+## AuthLayout Component
+
+The `AuthLayout` component handles authentication-based route protection in one place. It checks the user's authentication status from Redux and redirects the user based on the route requirements.
+
+### Flow
+
+```text id="f3m8q2"
+Check authentication status from Redux
+        ↓
+Is authentication required?
+        ↓
+   ┌────┴────┐
+  Yes       No
+   ↓         ↓
+Not logged  Already logged
+   ↓         ↓
+ /login       /
+```
+
+* `authentication = true` → page requires the user to be logged in.
+* `authentication = false` → page is for unauthenticated users, such as Login and Signup.
+* `authStatus` is obtained from the Redux store.
+* `navigate()` redirects the user when the authentication condition is not satisfied.
+* `loader` prevents the page from rendering until the authentication check is completed.
+
+### Example
+
+```jsx
+<Protected authentication={true}>
+    <Home />
+</Protected>
+```
+
+Protected page → unauthenticated user is redirected to `/login`.
+
+```jsx
+<Protected authentication={false}>
+    <Login />
+</Protected>
+```
+
+Guest-only page → authenticated user is redirected to `/`.
+
+
+# PostForm, PostSlice and RTE
+
+## PostForm Component
+
+The `PostForm` component is used for both **creating and updating blog posts**.
+
+It handles:
+
+* Post title
+* Slug generation
+* Content using TinyMCE RTE
+* Featured image upload
+* Post status
+* Creating posts
+* Updating posts
+* Updating Redux state after successful operations
+
+---
+
+## PostForm Flow
+
+### Create Post
+
+```text
+User fills PostForm
+        ↓
+React Hook Form
+        ↓
+Upload featured image
+        ↓
+database.createPost()
+        ↓
+Appwrite creates post
+        ↓
+dispatch(addPost(dbPost))
+        ↓
+navigate to post
+```
+
+### Update Post
+
+```text
+User edits PostForm
+        ↓
+React Hook Form
+        ↓
+Upload new image if selected
+        ↓
+Delete old image
+        ↓
+database.updatePost()
+        ↓
+Appwrite updates post
+        ↓
+dispatch(updatePost(dbPost))
+        ↓
+navigate to post
+```
+
+---
+
+# PostSlice
+
+`PostSlice` manages the posts on the client side using Redux Toolkit.
+
+```jsx
+const initialState = {
+    posts: []
+};
+```
+
+It contains three main reducers:
+
+### addPost
+
+Used after successfully creating a post.
+
+```jsx
+addPost: (state, action) => {
+    state.posts.push(action.payload);
+}
+```
+
+### updatePost
+
+Used after successfully updating a post.
+
+```jsx
+updatePost: (state, action) => {
+
+    const index = state.posts.findIndex(
+        (post) => post.$id === action.payload.$id
+    );
+
+    if (index !== -1) {
+        state.posts[index] = action.payload;
+    }
+}
+```
+
+### removePost
+
+Used after successfully deleting a post.
+
+```jsx
+removePost: (state, action) => {
+
+    state.posts = state.posts.filter(
+        (post) => post.$id !== action.payload
+    );
+
+}
+```
+
+---
+
+## PostSlice in PostForm
+
+Import the actions:
+
+```jsx
+import {
+    addPost,
+    updatePost
+} from "../../store/PostSlice";
+```
+
+Get `dispatch`:
+
+```jsx
+const dispatch = useDispatch();
+```
+
+After creating a post:
+
+```jsx
+const dbPost = await database.createPost({
+    ...data,
+    userId: userData.$id
+});
+
+if (dbPost) {
+
+    dispatch(addPost(dbPost));
+
+    navigate(`/post/${dbPost.$id}`);
+}
+```
+
+After updating a post:
+
+```jsx
+const dbPost = await database.updatePost(post.$id, {
+    ...data,
+    featuredImage: file
+        ? file.$id
+        : post.featuredImage
+});
+
+if (dbPost) {
+
+    dispatch(updatePost(dbPost));
+
+    navigate(`/post/${dbPost.$id}`);
+}
+```
+
+### Important Concept
+
+Redux is **not the permanent database**.
+
+```text
+Appwrite
+   ↓
+Permanent backend data
+
+Redux
+   ↓
+Client-side state/cache
+```
+
+Appwrite remains the source of truth, while Redux keeps the post data available to different React components.
+
+---
+
+# AuthSlice and PostForm
+
+The `AuthSlice` stores information about the currently logged-in user.
+
+```jsx
+const initialState = {
+    status: false,
+    userData: null
+};
+```
+
+After login:
+
+```jsx
+login: (state, action) => {
+
+    state.status = true;
+
+    state.userData = action.payload;
+
+}
+```
+
+Therefore, in `PostForm` we can get the current user using:
+
+```jsx
+const userData = useSelector(
+    (state) => state.auth.userData
+);
+```
+
+Then while creating a post:
+
+```jsx
+userId: userData.$id
+```
+
+This connects the post with the user who created it.
+
+---
+
+# RTE Component
+
+`RTE` stands for **Rich Text Editor**.
+
+This project uses **TinyMCE** as the rich text editor.
+
+The editor allows users to create formatted content instead of entering plain text.
+
+For example, users can use:
+
+* Bold
+* Italic
+* Lists
+* Images
+* Links
+* Text alignment
+* Headings
+* Tables
+
+---
+
+## RTE Component
+
+```jsx
+import React from 'react'
+import { Editor } from "@tinymce/tinymce-react"
+import { Controller } from "react-hook-form"
+
+function RTE({
+    name,
+    control,
+    label,
+    defaultValue = ""
+}) {
+
+    return (
+
+        <div className='w-full'>
+
+            {label && (
+                <label className='inline-block mb-1 pl-1'>
+                    {label}
+                </label>
+            )}
+
+            <Controller
+                name={name || "Content"}
+                control={control}
+
+                render={({ field: { onChange } }) => (
+
+                    <Editor
+                        initialValue={defaultValue}
+
+                        init={{
+                            height: 500,
+
+                            plugins: [
+                                "image",
+                                "advlist",
+                                "autolink",
+                                "lists",
+                                "link",
+                                "charmap",
+                                "preview",
+                                "anchor",
+                                "searchreplace",
+                                "visualblocks",
+                                "code",
+                                "fullscreen",
+                                "insertdatetime",
+                                "media",
+                                "table",
+                                "help",
+                                "wordcount"
+                            ],
+
+                            toolbar:
+                                "undo redo | blocks | image | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help",
+
+                            content_style:
+                                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }"
+                        }}
+
+                        onEditorChange={onChange}
+                    />
+
+                )}
+            />
+
+        </div>
+    )
+}
+
+export default RTE
+```
+
+---
+
+# Why Controller is Used?
+
+Normally, React Hook Form can register native inputs directly:
+
+```jsx
+<Input {...register("title")} />
+```
+
+But TinyMCE is a **third-party controlled component**.
+
+Therefore, `register()` is not directly suitable for it.
+
+`Controller` acts as a bridge between **React Hook Form** and **TinyMCE**.
+
+```text
+TinyMCE
+   ↓
+onEditorChange
+   ↓
+Controller
+   ↓
+React Hook Form
+   ↓
+form data
+```
+
+The important part is:
+
+```jsx
+<Controller
+    name={name}
+    control={control}
+    render={({ field: { onChange } }) => (
+        <Editor
+            onEditorChange={onChange}
+        />
+    )}
+/>
+```
+
+When the editor content changes:
+
+```jsx
+onEditorChange
+```
+
+calls:
+
+```jsx
+onChange
+```
+
+and React Hook Form receives the updated content.
+
+---
+
+# Using RTE in PostForm
+
+First, get `control` from `useForm()`:
+
+```jsx
+const {
+    register,
+    control,
+    handleSubmit,
+    watch,
+    getValues,
+    setValue
+} = useForm();
+```
+
+Then pass it to `RTE`:
+
+```jsx
+<RTE
+    label="Content :"
+    name="content"
+    control={control}
+    defaultValue={getValues("content")}
+/>
+```
+
+Here:
+
+* `name` → name of the form field
+* `control` → React Hook Form control object
+* `label` → label displayed above editor
+* `defaultValue` → initial content when editing an existing post
+
+---
+
+# Slug Generation
+
+The `PostForm` automatically generates a slug from the title.
+
+Example:
+
+```text
+My First Blog Post
+        ↓
+my-first-blog-post
+```
+
+The transformation is handled by:
+
+```jsx
+const slugTransform = useCallback((value) => {
+
+    if (value && typeof value === "string")
+
+        return value
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-zA-Z\d\s]+/g, "-")
+            .replace(/\s/g, "-");
+
+    return "";
+
+}, []);
+```
+
+The `watch()` subscription watches the title:
+
+```jsx
+const subscription = watch((value, { name }) => {
+
+    if (name === "title") {
+
+        setValue(
+            "slug",
+            slugTransform(value.title),
+            { shouldValidate: true }
+        );
+
+    }
+
+});
+```
+
+So whenever the title changes, the slug is automatically updated.
+
+The user can also manually edit the slug because the slug field itself is registered with React Hook Form.
+
+---
+
+# Overall Data Flow
+
+```text
+                    ┌───────────────┐
+                    │    PostForm   │
+                    └───────┬───────┘
+                            │
+             ┌──────────────┼──────────────┐
+             ↓              ↓              ↓
+        React Hook      TinyMCE RTE     Featured Image
+           Form              │              │
+             │               │              │
+             └───────────────┼──────────────┘
+                             ↓
+                      Appwrite Service
+                             ↓
+                    ┌────────┴────────┐
+                    ↓                 ↓
+                 Create             Update
+                    ↓                 ↓
+                    └────────┬────────┘
+                             ↓
+                          Appwrite
+                             ↓
+                         dbPost
+                             ↓
+                    ┌────────┴────────┐
+                    ↓                 ↓
+              addPost()          updatePost()
+                    ↓                 ↓
+                    └────────┬────────┘
+                             ↓
+                        PostSlice
+                             ↓
+                       Redux Store
+```
+
+## Main Responsibility
+
+```text
+AuthSlice
+    → Stores logged-in user
+
+PostSlice
+    → Stores posts on client side
+
+PostForm
+    → Handles create/update form
+
+RTE
+    → Handles rich text content
+
+Database Service
+    → Communicates with Appwrite TablesDB
+
+Bucket Service
+    → Handles featured images
+
+Appwrite
+    → Permanent backend storage
+```
+
+
 # Complete Backend Flow
 
 The current backend setup can be visualized as:
