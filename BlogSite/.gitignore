@@ -15,6 +15,9 @@ dist-ssr
 # Environment variables
 .env
 
+# Personal project notes
+NOTES.md
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
