@@ -6,7 +6,7 @@ const Select = ({ ref, options, label, className = "", ...props }) => {
     return (
         <div className='w-full'>
             {
-                label && <label htmlFor={id} className=''></label>
+                label && <label htmlFor={id} className=''>{label}</label>
             }
             <select
                 ref={ref}

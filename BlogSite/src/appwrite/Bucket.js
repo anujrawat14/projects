@@ -50,10 +50,14 @@ export class Bucket {
         }
     }
 
-    //get file preview
-    getFilePreview(fileid) {
+    //get file preview has errors as {
+    //  "message": "Image transformations are blocked on your current plan. Please upgrade to a higher plan. ",
+  
+    //so using file vie works better
+
+    getFileView(fileid) {
         try {
-            return this.storage.getFilePreview({
+            return this.storage.getFileView({
                 bucketId: Conf.appwriteBucketId,
                 fileId: fileid
             })

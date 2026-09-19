@@ -2,7 +2,7 @@ import React from 'react'
 
 const Button = (
     {
-        text,
+        children,
         type = "button",
         bgColor = "bg-blue-400",
         textColor = "text-white",
@@ -12,12 +12,10 @@ const Button = (
 ) => {
     return (
         <button
+            type={type}
             {...props}
             className={`px-4 py-2 rounded-lg ${className} ${bgColor} ${textColor}`}>
-
-            {text}
-
-        </button>
+            {children}   </button>
     )
 }
 

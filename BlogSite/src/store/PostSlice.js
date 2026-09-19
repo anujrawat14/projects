@@ -1,13 +1,21 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    posts: []
+    posts: [],
+    currentPost: null
+
 };
 
 const PostSlice = createSlice({
     name: "post",
     initialState,
     reducers: {
+        setPosts: (state, action) => {
+            state.posts = action.payload;
+        },
+        setCurrentPost: (state, action) => {
+            state.currentPost = action.payload;
+        },
         addPost: (state, action) => {
             state.posts.push(action.payload);
         },
@@ -22,9 +30,11 @@ const PostSlice = createSlice({
             if (index !== -1) {
                 state.posts[index] = action.payload;
             }
+
+            state.currentPost = action.payload;
         }
     }
 });
 
-export const { addPost, updatePost, removePost } = PostSlice.actions;
+export const { setPosts, setCurrentPost, addPost, updatePost, removePost } = PostSlice.actions;
 export default PostSlice.reducer;

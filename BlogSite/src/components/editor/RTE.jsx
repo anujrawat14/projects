@@ -1,8 +1,10 @@
-import React, { useRef } from 'react'
+import React, { useEffect } from 'react'
 import { Editor } from "@tinymce/tinymce-react"
 import { Controller } from "react-hook-form"
+import Conf from '../../conf/Conf'
 
 function RTE({ name, control, label, defaultValue = "" }) {
+
     return (
         <div className='w-full'>
             {
@@ -14,9 +16,11 @@ function RTE({ name, control, label, defaultValue = "" }) {
 
                 render={({ field: { onChange } }) => (
                     <Editor
+                        apiKey={Conf.tinymce_editor_API_key}
                         initialValue={defaultValue}
                         init={{
                             height: 500,
+                            readonly: false,
 
                             plugins: [
                                 "image", "advlist", "autolink", "lists", "link", "image", "charmap", "preview", "anchor", "searchreplace", "visualblocks", "code", "fullscreen", "insertdatetime", "media", "table", "code", "help", "wordcount", "anchor",
@@ -33,9 +37,9 @@ function RTE({ name, control, label, defaultValue = "" }) {
 
         </div>
     )
+
+
 }
 
 export default RTE
-
-
 

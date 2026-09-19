@@ -93,10 +93,10 @@ export class Database {
                 databaseId: Conf.appwriteDatabaseId,
                 tableId: Conf.appwriteTableId,
                 queries: [
-                    Query.equal('status', true),
+                    Query.equal("status", true),
                     Query.orderAsc("title")
                 ]
-
+                // tgis will return an array of posts
             })
         } catch (error) {
             console.log("Appwrite error :: while showing all posts :: ", error.message);
